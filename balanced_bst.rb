@@ -16,7 +16,7 @@ class Tree
   def initialize(array = [])
     @array = sort_array(array)
     p @array
-    @root = build_tree(@array)
+    @root = build_tree(array)
   end
 
   def sort_array(array)
@@ -26,7 +26,7 @@ class Tree
 
 
   def build_tree(array, start = 0, final = array.length - 1)
-    return nil if start > final
+    return nil if array.empty?
 
     mid = (start + final) / 2
     root_node = Node.new(array[mid])
@@ -37,28 +37,56 @@ class Tree
   end
 
 
-  def insert(value, root)
-  	# binding.pry
-  	return Node.new(value) if root.nil?
+  def insert(value, root = @root)
+    # binding.pry
+    if value == root.data
+      return nil
+    end
 
-  	if root.data == value
-  		return root
+    if root.data < value
+      root.right.nil? ? root.right = Node.new(value) : insert(value, root.right)
+    else
+      root.left.nil? ? root.left = Node.new(value) : insert(value, root.left)
+    end
+  end
 
-  	elsif root.data < value
-		root.right = insert(value, root.right)
-	else	
-		root.left = insert(value, root.left)
-  	end
-  	root
+  def min_value(node)
+	current = node 
+
+	while(current.left != nil) 
+		current = current.left
+	end	
+	return current
+  end
+
+  def delete(value, root = @root)
+    return root if root.nil?
+
+    if value < root.data
+      root.left = delete(value, root.left)
+    elsif value > root.data
+      root.right = delete(value, root.right)
+    else
+      if root.left.nil?
+        temp = root.right
+        root = nil
+        return temp
+      elsif root.right.nil?
+      	temp = root.left
+      	root = nil
+      	return temp
+      end
+      temp = min_value(root.right)
+
+      root.data = temp.data
+
+      root.right = delete(temp.data, root.right)
+    end
+    return root
   end
 
 
-  def delete(value, root)
-
-  end
-
-
-  def find(value, root)
+  def find(value, root = @root)
     return "Value #{value} doesn't exist in tree." if root.nil?
 
     if root.data == value
@@ -88,20 +116,27 @@ end
 array = [1, 3, 4, 7, 5, 6, 7]
 
 bst = Tree.new(array)
+
+bst.insert(10)
+bst.insert(11)
+bst.insert(31)
+
+# binding.pry
 puts
-# puts bst.find(4, bst.root)
-# puts bst.find(1, bst.root)
-# puts bst.find(10, bst.root)
-# puts bst.find(6, bst.root)
 
+# puts bst.find(3)
+# puts bst.find(10)
+
+puts
 bst.pretty_print
 
-bst.insert(10, bst.root)
-bst.insert(2, bst.root)
-bst.insert(11, bst.root)
-# bst.insert(12, bst.root)
+bst.delete(10)
+bst.delete(31)
+bst.delete(4)
 
-
-puts "-------"
 
 bst.pretty_print
+# bst.is_leaf?(7)
+
+
+# bst.pretty_print
