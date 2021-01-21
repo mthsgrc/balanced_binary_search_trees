@@ -13,7 +13,7 @@ end
 class Tree
   attr_accessor :root, :array
 
-  def initialize(array)
+  def initialize(array = [])
     @array = sort_array(array)
     p @array
     @root = build_tree(@array)
@@ -38,15 +38,18 @@ class Tree
 
 
   def insert(value, root)
+  	# binding.pry
   	return Node.new(value) if root.nil?
 
   	if root.data == value
   		return root
+
   	elsif root.data < value
-		root.right = insert(value, root.right)  			
+		root.right = insert(value, root.right)
 	else	
-		root.left = insert(value, root.left)  			
+		root.left = insert(value, root.left)
   	end
+  	root
   end
 
 
@@ -61,7 +64,7 @@ class Tree
     if root.data == value
       return "#{root.data} found in tree."
     end
-    
+
     if value < root.data
       return find(value, root.left)
     else
@@ -82,7 +85,7 @@ end
 
 
 # array = [1, 7, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
-array = [1, 2, 3, 4, 7, 5, 6, 7]
+array = [1, 3, 4, 7, 5, 6, 7]
 
 bst = Tree.new(array)
 puts
@@ -94,6 +97,11 @@ puts
 bst.pretty_print
 
 bst.insert(10, bst.root)
+bst.insert(2, bst.root)
+bst.insert(11, bst.root)
+bst.insert(12, bst.root)
+
+
 puts "-------"
 
 bst.pretty_print
