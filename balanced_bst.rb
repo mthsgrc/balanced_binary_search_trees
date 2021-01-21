@@ -99,7 +99,7 @@ bst.pretty_print
 bst.insert(10, bst.root)
 bst.insert(2, bst.root)
 bst.insert(11, bst.root)
-bst.insert(12, bst.root)
+# bst.insert(12, bst.root)
 
 
 puts "-------"
