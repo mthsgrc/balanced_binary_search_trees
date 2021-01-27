@@ -3,7 +3,7 @@ require 'pry'
 class Node
   include Comparable
   attr_accessor :data, :left, :right
-  
+
   def initialize(data)
     @data = data
     @left = nil
@@ -11,8 +11,13 @@ class Node
   end
 
   def <=>(other)
-  	# binding.pry
-	self.data <=> other.data
+    # binding.pry
+
+    if other.is_a?(Node)
+      self.data <=> other.data
+    else
+      self.data <=> other
+    end
   end
 end
 
@@ -21,7 +26,7 @@ class Tree
   attr_accessor :root, :array
 
   def initialize(array)
-    @array = sort_array(array)
+    @array = sort_array(array) if array.is_a?(Array)
     @root = build_tree(array)
   end
 
@@ -50,7 +55,7 @@ class Tree
     end
 
     #if value is greater than root, insert to right
-    if root.data < value
+    if value > root.data
       root.right.nil? ? root.right = Node.new(value) : insert(value, root.right)
       #the value is less than root, insert left
     else
@@ -105,44 +110,46 @@ class Tree
 
 
   def find(value, root = @root)
-    return "Value #{value} doesn't exist in tree." if root.nil?
+    # return "Value #{value} doesn't exist in tree." if root.nil?
+    return nil if root.nil?
+
+    # return if value.nil?
+    binding.pry
 
     if root.data == value
-      return "#{root.data} found in tree."
+      return root
     end
-
     if value < root.data
       return find(value, root.left)
     else
       return find(value, root.right)
     end
-  end
 
+
+  end
 
   def level_order(root = @root, queue = [], output = [])
     return nil if root.nil?
 
-    queue << root
+    # queue << root
+    # while !queue.empty?
+    #   current = queue.shift
+    #   binding.pry
+    #   queue << current.left if current.left != nil
+    #   queue << current.right if current.right != nil
 
-    while !queue.empty?
-      current = queue.shift
-
-      # binding.pry
-      queue << current.left if current.left != nil
-      queue << current.right if current.right != nil
-
-      output << current.data
-    end
-    output
-
-    # below is the same recursively
-    # output << root.data
-    # queue << root.left unless root.left.nil?
-    # queue << root.right unless root.right.nil?
-    # p output
-    # return if queue.empty?
-    # level_order(queue.shift, queue, output)
+    #   output << current.data
+    # end
     # output
+
+    # below do the same recursively
+    output << root.data
+    queue << root.left unless root.left.nil?
+    queue << root.right unless root.right.nil?
+    p output
+    return if queue.empty?
+    level_order(queue.shift, queue, output)
+    output
   end
 
 
@@ -179,6 +186,34 @@ class Tree
     postorder_list
   end
 
+  def height(node = @root)
+    unless node.nil? || node == root
+    	node = (node.instance_of?(Node) ? find(node.data) : find(node))
+    end
+
+    return -1 if node.nil?
+
+    [height(node.left), height(node.right)].max + 1
+
+  end
+
+  def depth(node, parent = root, depth = 0)
+  	return -1 if parent.nil?
+
+    binding.pry
+    	
+    if node < parent.data 
+    	depth += 1
+    	depth(node, parent.left, depth)
+    elsif node > parent.data
+    	depth += 1
+    	depth(node, parent.right, depth)
+    else
+    	depth
+    end
+  end
+
+
 
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
@@ -197,26 +232,25 @@ array = [1, 2, 3, 4, 5]
 
 bst = Tree.new(array)
 
-bst.insert(6)
-# bst.insert(3)
-# bst.insert(4)
-# bst.insert(5)
+# p bst.find(1)
 
 
 bst.pretty_print
+
 puts
-print "Inorder(left, root, right) = #{bst.inorder}"
-puts
-print "Preorder(root, left, right) = #{bst.preorder}"
-puts
-print "Postorder(left, right, root) = #{bst.postorder}"
-puts
+p bst.height(3)
 
 
+# p bst.depth
+# puts
+# print "Inorder(left, root, right) = #{bst.inorder}"
+# puts
+# print "Preorder(root, left, right) = #{bst.preorder}"
+# puts
+# print "Postorder(left, right, root) = #{bst.postorder}"
+
+# puts bst.height(5)
 
 
-
-
-# bst.level_order
 
 # bst.pretty_print
