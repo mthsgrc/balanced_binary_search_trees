@@ -11,8 +11,6 @@ class Node
   end
 
   def <=>(other)
-    # binding.pry
-
     if other.is_a?(Node)
       self.data <=> other.data
     else
@@ -35,18 +33,15 @@ class Tree
     array
   end
 
-
   def build_tree(array, start = 0, final = array.length - 1)
     return nil if array.empty?
 
     mid = (start + final) / 2
     root_node = Node.new(array[mid])
-
     root_node.left = build_tree(array[0...mid])
     root_node.right = build_tree(array[mid+1..-1])
     root_node
   end
-
 
   def insert(value, root = @root)
     #value already exists
@@ -72,7 +67,6 @@ class Tree
     return current.data
   end
 
-
   def delete(value, root = @root)
     #base case
     return root if root.nil?
@@ -94,23 +88,18 @@ class Tree
         root = nil
         return temp
       end
-
       # Node with two children
       # Get the min value in subtree
       temp = min_value(root.right)
-
       # Copy the successor content to this node
       root.data = temp
-
       # Delete inoder successor
       root.right = delete(root.data, root.right)
     end
     return root
   end
 
-
   def find(value, root = @root)
-    # return "Value #{value} doesn't exist in tree." if root.nil?
     return nil if root.nil?
 
     if root.data == value
@@ -125,7 +114,6 @@ class Tree
 
   def level_order(root = @root, queue = [], output = [])
     return nil if root.nil?
-
     # queue << root
     # while !queue.empty?
     #   current = queue.shift
@@ -141,46 +129,34 @@ class Tree
     output << root.data
     queue << root.left unless root.left.nil?
     queue << root.right unless root.right.nil?
-    # p output
     return if queue.empty?
     level_order(queue.shift, queue, output)
     output
   end
 
-
-
   def inorder(root = @root, inorder_list = [])
     return if root.nil?
-
     inorder(root.left, inorder_list)
     inorder_list << root.data
     inorder(root.right, inorder_list)
-
     inorder_list
   end
 
-
   def preorder(root = @root, preorder_list = [])
     return if root.nil?
-
     preorder_list << root.data
     preorder(root.left, preorder_list)
     preorder(root.right, preorder_list)
-
     preorder_list
   end
 
-
   def postorder(root = @root, postorder_list = [])
     return if root.nil?
-
     postorder(root.left, postorder_list)
     postorder(root.right, postorder_list)
     postorder_list << root.data
-
     postorder_list
   end
-
 
   def height(node = root)
     unless node.nil?
@@ -188,11 +164,10 @@ class Tree
     end
     return -1 if node.nil?
 
-    lheight = height(node.left)
-    rheight = height(node.right)
-    lheight > rheight ? lheight + 1 : rheight + 1
+    l_height = height(node.left)
+    r_height = height(node.right)
+    l_height > r_height ? l_height + 1 : r_height + 1
   end
-
 
   def depth(node, parent = root, depth = 0)
     return -1 if parent.nil?
@@ -203,14 +178,13 @@ class Tree
     elsif node > parent.data
       depth += 1
       depth(node, parent.right, depth)
-    else #they are the same
+    else # they are the same
       depth
     end
   end
 
   def balanced?(node = root)
     return true if node.nil?
-
     l_height = height(node.left)
     r_height = height(node.right)
     result = l_height.abs - r_height.abs
@@ -223,14 +197,12 @@ class Tree
   end
 
   def rebalance
-    # binding.pry
     return if self.balanced? == true
 
     to_rebalance = self.level_order
     to_rebalance = sort_array(to_rebalance)
-
-    balanced_tree = self.build_tree(to_rebalance)
-    pretty_print(balanced_tree)
+    balanced_tree = Tree.new(to_rebalance)
+    balanced_tree
   end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
@@ -240,34 +212,30 @@ class Tree
   end
 end
 
-
-array = Array.new(15) { rand(1..100)  }
+array = Array.new(15) { rand(1..1000) }
 
 bst = Tree.new(array)
 
-p "Is the tree balanced: #{bst.balanced?}"
-puts "1"
-p bst.inorder
-p bst.preorder
-p bst.postorder
+p "Is the tree balanced? #{bst.balanced?}"
+puts
+p "Inorder transversal > #{bst.inorder}"
+p "Preorder transversal > #{bst.preorder}"
+p "Postorder transversal > #{bst.postorder}"
+puts
 bst.pretty_print
-
-
-bst.insert(120)
-bst.insert(101)
-bst.insert(123)
-puts "2"
-bst.pretty_print
-
-p "Is the tree balanced: #{bst.balanced?}"
-
-p bst.rebalance
-puts "3"
-
-p "Is the tree balanced: #{bst.balanced?}"
-
-p bst.inorder
-p bst.preorder
-p bst.postorder
-
+puts
+bst.insert(1200)
+bst.insert(1010)
+bst.insert(1230)
+p "Is the tree balanced? #{bst.balanced?}"
+puts
+p 'Rebalancing the tree...'
+puts
+bst = bst.rebalance
+p "Is the tree balanced? #{bst.balanced?}"
+puts
+p "Inorder transversal > #{bst.inorder}"
+p "Preorder transversal > #{bst.preorder}"
+p "Postorder transversal > #{bst.postorder}"
+puts
 bst.pretty_print
