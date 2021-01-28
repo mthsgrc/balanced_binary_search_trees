@@ -113,9 +113,6 @@ class Tree
     # return "Value #{value} doesn't exist in tree." if root.nil?
     return nil if root.nil?
 
-    # return if value.nil?
-    binding.pry
-
     if root.data == value
       return root
     end
@@ -124,8 +121,6 @@ class Tree
     else
       return find(value, root.right)
     end
-
-
   end
 
   def level_order(root = @root, queue = [], output = [])
@@ -146,7 +141,7 @@ class Tree
     output << root.data
     queue << root.left unless root.left.nil?
     queue << root.right unless root.right.nil?
-    p output
+    # p output
     return if queue.empty?
     level_order(queue.shift, queue, output)
     output
@@ -186,71 +181,93 @@ class Tree
     postorder_list
   end
 
-  def height(node = @root)
-    unless node.nil? || node == root
-    	node = (node.instance_of?(Node) ? find(node.data) : find(node))
-    end
 
+  def height(node = root)
+    unless node.nil?
+      node = find(node)
+    end
     return -1 if node.nil?
 
-    [height(node.left), height(node.right)].max + 1
-
+    lheight = height(node.left)
+    rheight = height(node.right)
+    lheight > rheight ? lheight + 1 : rheight + 1
   end
 
-  def depth(node, parent = root, depth = 0)
-  	return -1 if parent.nil?
 
-    binding.pry
-    	
-    if node < parent.data 
-    	depth += 1
-    	depth(node, parent.left, depth)
+  def depth(node, parent = root, depth = 0)
+    return -1 if parent.nil?
+
+    if node < parent.data
+      depth += 1
+      depth(node, parent.left, depth)
     elsif node > parent.data
-    	depth += 1
-    	depth(node, parent.right, depth)
-    else
-    	depth
+      depth += 1
+      depth(node, parent.right, depth)
+    else #they are the same
+      depth
     end
   end
 
+  def balanced?(node = root)
+    return true if node.nil?
 
+    l_height = height(node.left)
+    r_height = height(node.right)
+    result = l_height.abs - r_height.abs
+    result = result.abs
+    if result > 1
+      return false
+    else
+      true
+    end
+  end
+
+  def rebalance
+    # binding.pry
+    return if self.balanced? == true
+
+    to_rebalance = self.level_order
+    to_rebalance = sort_array(to_rebalance)
+
+    balanced_tree = self.build_tree(to_rebalance)
+    pretty_print(balanced_tree)
+  end
 
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.data}"
     pretty_print(node.left, "#{prefix}#{is_left ? '    ' : '│   '}", true) if node.left
   end
-
-  private
-
 end
 
-# array = [1, 7, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
-array = [1, 2, 3, 4, 5]
-# array = [1, 2, 3]
 
+array = Array.new(15) { rand(1..100)  }
 
 bst = Tree.new(array)
 
-# p bst.find(1)
-
-
+p "Is the tree balanced: #{bst.balanced?}"
+puts "1"
+p bst.inorder
+p bst.preorder
+p bst.postorder
 bst.pretty_print
 
-puts
-p bst.height(3)
 
+bst.insert(120)
+bst.insert(101)
+bst.insert(123)
+puts "2"
+bst.pretty_print
 
-# p bst.depth
-# puts
-# print "Inorder(left, root, right) = #{bst.inorder}"
-# puts
-# print "Preorder(root, left, right) = #{bst.preorder}"
-# puts
-# print "Postorder(left, right, root) = #{bst.postorder}"
+p "Is the tree balanced: #{bst.balanced?}"
 
-# puts bst.height(5)
+p bst.rebalance
+puts "3"
 
+p "Is the tree balanced: #{bst.balanced?}"
 
+p bst.inorder
+p bst.preorder
+p bst.postorder
 
-# bst.pretty_print
+bst.pretty_print
